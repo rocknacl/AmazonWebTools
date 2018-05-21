@@ -35,7 +35,7 @@ public class SendEmailServlet extends HttpServlet {
 
 			String[] account = SendEmailDAO.getSendEmailDAO().readAmazonAccount();
 			if (account != null)
-				response.getWriter().append(account[0] + " " + account[1]);
+				response.getWriter().append(account[0] + " " + account[1] + " " + account[2]);
 
 		}
 		if (operation.equals(Operation.GetAmazonSellerID.toString())) {
@@ -71,7 +71,10 @@ public class SendEmailServlet extends HttpServlet {
 			String name = (String) request.getParameter("name");
 			String hostIP = (String) request.getRemoteAddr();
 			String nation = (String) request.getParameter("nation");
-			SendEmailDAO.getSendEmailDAO().saveRegisteredRobotAccount(email, password, nation, name, hostIP);
+			String alias = (String) request.getParameter("alias");
+			String grm_user_name = (String) request.getParameter("userName");
+			SendEmailDAO.getSendEmailDAO().saveRegisteredRobotAccount(email, password, nation, name, hostIP, alias,
+					grm_user_name);
 			response.getWriter().append("success");
 			return;
 		}

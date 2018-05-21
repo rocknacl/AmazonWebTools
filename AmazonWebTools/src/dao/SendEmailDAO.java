@@ -115,7 +115,7 @@ public class SendEmailDAO {
 		try {
 			conn = ConnectionPool.getConnectionPool().getConnection();
 			PreparedStatement pstmt = conn.prepareStatement(
-					"update contactseller_robot_account set block_time = now(),send_assigned = null where email=?");
+					"update robot_account set block_time = now(),send_assigned = null where email=?");
 			pstmt.setString(1, email);
 			pstmt.addBatch();
 			pstmt.executeBatch();
@@ -135,11 +135,12 @@ public class SendEmailDAO {
 		Connection conn = null;
 		try {
 			conn = ConnectionPool.getConnectionPool().getConnection();
-			String sql = "select email,password from contactseller_robot_account where (block_time is null or datediff(now(),block_time)>1) and send_assigned is null limit 1";
+			String sql = "select email,password,grm_user_name from robot_account where (block_time is null or datediff(now(),block_time)>1) and send_assigned is null limit 1";
 			Statement stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
 			if (rs.next()) {
-				result = new String[] { rs.getString("email"), rs.getString("password") };
+				result = new String[] { rs.getString("email"), rs.getString("password"),
+						rs.getString("grm_user_name") };
 				stmt.execute("update contactseller_robot_account set send_assigned = 1 where email = '"
 						+ rs.getString("email") + "'");
 			}
@@ -157,16 +158,19 @@ public class SendEmailDAO {
 
 	}
 
-	public void saveRegisteredRobotAccount(String email, String password, String nation, String name, String hostIp) {
+	public void saveRegisteredRobotAccount(String email, String password, String nation, String name, String hostIp,
+			String alias, String grm_user_name) {
 		Connection conn = null;
 		try {
 			conn = ConnectionPool.getConnectionPool().getConnection();
-			String sql = "insert into robot_account(email,password,host_ip,nation) values(?,?,?,?)";
+			String sql = "insert into robot_account(email,password,host_ip,nation,alias,grm_user_name) values(?,?,?,?,?,?)";
 			PreparedStatement pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, email);
 			pstmt.setString(2, password);
 			pstmt.setString(3, hostIp);
 			pstmt.setString(4, nation);
+			pstmt.setString(5, alias);
+			pstmt.setString(6, grm_user_name);
 			pstmt.addBatch();
 			pstmt.executeBatch();
 		} catch (SQLException e) {
